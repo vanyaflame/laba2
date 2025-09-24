@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Конфигурация подключения к БД
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? "Host=db;Port=5432;Database=taskdb;Username=postgres;Password=YourStrongPassword123";
+    ?? "Host=db;Database=taskdb;Username=postgres;Password=YourStrongPassword123";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
