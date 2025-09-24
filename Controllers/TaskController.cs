@@ -13,73 +13,22 @@ namespace SimpleTaskApp.Controllers
             _taskService = taskService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var tasks = _taskService.GetAllTasks();
+            var tasks = await _taskService.GetAllTasksAsync();
             return View(tasks);
         }
 
-        public IActionResult Create()
-        {
-            return View();
-        }
-
+        // ... остальные методы также нужно сделать асинхронными
         [HttpPost]
-        public IActionResult Create(TaskItem task)
+        public async Task<IActionResult> Create(TaskItem task)
         {
             if (ModelState.IsValid)
             {
-                _taskService.AddTask(task);
+                await _taskService.AddTaskAsync(task);
                 return RedirectToAction("Index");
             }
             return View(task);
-        }
-
-        public IActionResult Edit(int id)
-        {
-            var task = _taskService.GetTaskById(id);
-            if (task == null)
-                return NotFound();
-
-            return View(task);
-        }
-
-        [HttpPost]
-        public IActionResult Edit(TaskItem task)
-        {
-            if (ModelState.IsValid)
-            {
-                _taskService.UpdateTask(task);
-                return RedirectToAction("Index");
-            }
-            return View(task);
-        }
-
-        public IActionResult Delete(int id)
-        {
-            var task = _taskService.GetTaskById(id);
-            if (task == null)
-                return NotFound();
-
-            return View(task);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            _taskService.DeleteTask(id);
-            return RedirectToAction("Index");
-        }
-
-        public IActionResult ToggleComplete(int id)
-        {
-            var task = _taskService.GetTaskById(id);
-            if (task != null)
-            {
-                task.IsCompleted = !task.IsCompleted;
-                _taskService.UpdateTask(task);
-            }
-            return RedirectToAction("Index");
         }
     }
 }

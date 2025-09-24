@@ -1,12 +1,28 @@
+using Microsoft.EntityFrameworkCore;
+using SimpleTaskApp.Models;
 using SimpleTaskApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Конфигурация подключения к БД
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? "Host=db;Port=5432;Database=taskdb;Username=postgres;Password=YourStrongPassword123";
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<ITaskService, TaskService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 var app = builder.Build();
+
+// Создание БД при первом запуске
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    context.Database.EnsureCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

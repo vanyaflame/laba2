@@ -1,47 +1,52 @@
+using Microsoft.EntityFrameworkCore;
 using SimpleTaskApp.Models;
 
 namespace SimpleTaskApp.Services
 {
     public interface ITaskService
     {
-        List<TaskItem> GetAllTasks();
-        TaskItem GetTaskById(int id);
-        void AddTask(TaskItem task);
-        void UpdateTask(TaskItem task);
-        void DeleteTask(int id);
+        Task<List<TaskItem>> GetAllTasksAsync();
+        Task<TaskItem> GetTaskByIdAsync(int id);
+        Task AddTaskAsync(TaskItem task);
+        Task UpdateTaskAsync(TaskItem task);
+        Task DeleteTaskAsync(int id);
     }
 
     public class TaskService : ITaskService
     {
-        private readonly List<TaskItem> _tasks = new();
-        private int _nextId = 1;
+        private readonly ApplicationDbContext _context;
 
-        public List<TaskItem> GetAllTasks() => _tasks;
-
-        public TaskItem GetTaskById(int id) => _tasks.FirstOrDefault(t => t.Id == id);
-
-        public void AddTask(TaskItem task)
+        public TaskService(ApplicationDbContext context)
         {
-            task.Id = _nextId++;
-            _tasks.Add(task);
+            _context = context;
         }
 
-        public void UpdateTask(TaskItem task)
+        public async Task<List<TaskItem>> GetAllTasksAsync() 
+            => await _context.Tasks.OrderByDescending(t => t.CreatedDate).ToListAsync();
+
+        public async Task<TaskItem> GetTaskByIdAsync(int id) 
+            => await _context.Tasks.FindAsync(id);
+
+        public async Task AddTaskAsync(TaskItem task)
         {
-            var existingTask = GetTaskById(task.Id);
-            if (existingTask != null)
-            {
-                existingTask.Title = task.Title;
-                existingTask.Description = task.Description;
-                existingTask.IsCompleted = task.IsCompleted;
-            }
+            _context.Tasks.Add(task);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteTask(int id)
+        public async Task UpdateTaskAsync(TaskItem task)
         {
-            var task = GetTaskById(id);
+            _context.Tasks.Update(task);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteTaskAsync(int id)
+        {
+            var task = await GetTaskByIdAsync(id);
             if (task != null)
-                _tasks.Remove(task);
+            {
+                _context.Tasks.Remove(task);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
