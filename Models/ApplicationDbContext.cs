@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleTaskApp.Models;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace SimpleTaskApp.Models
 {
