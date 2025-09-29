@@ -36,13 +36,18 @@
                             <span class="badge bg-warning">В процессе</span>
                         }
                     </td>
-                    <td>@task.CreatedDate.ToString("dd.MM.yyyy")</td>
+                    <td>@task.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
                     <td>
                         <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-outline-primary">Изменить</a>
                         <a asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-outline-danger">Удалить</a>
-                        <a asp-action="ToggleComplete" asp-route-id="@task.Id" class="btn btn-sm btn-outline-secondary">
-                            @(task.IsCompleted ? "Отменить" : "Выполнить")
-                        </a>
+                        
+                        <!-- Заменяем ссылку на форму для ToggleComplete -->
+                        <form asp-action="ToggleComplete" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@task.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                @(task.IsCompleted ? "Отменить" : "Выполнить")
+                            </button>
+                        </form>
                     </td>
                 </tr>
             }

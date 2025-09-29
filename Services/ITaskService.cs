@@ -6,7 +6,7 @@ namespace SimpleTaskApp.Services
     public interface ITaskService
     {
         Task<List<TaskItem>> GetAllTasksAsync();
-        Task<TaskItem> GetTaskByIdAsync(int id);
+        Task<TaskItem?> GetTaskByIdAsync(int id);
         Task AddTaskAsync(TaskItem task);
         Task UpdateTaskAsync(TaskItem task);
         Task DeleteTaskAsync(int id);
@@ -24,11 +24,12 @@ namespace SimpleTaskApp.Services
         public async Task<List<TaskItem>> GetAllTasksAsync() 
             => await _context.Tasks.OrderByDescending(t => t.CreatedDate).ToListAsync();
 
-        public async Task<TaskItem> GetTaskByIdAsync(int id) 
+        public async Task<TaskItem?> GetTaskByIdAsync(int id) 
             => await _context.Tasks.FindAsync(id);
 
         public async Task AddTaskAsync(TaskItem task)
         {
+            task.CreatedDate = DateTime.UtcNow;
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
         }
